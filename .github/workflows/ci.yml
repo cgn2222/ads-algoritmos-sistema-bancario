@@ -1,0 +1,28 @@
+name: C11 CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: Build, Unit Tests & Sanitizers (${{ matrix.compiler }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gcc, clang]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verificar compilador
+        run: ${{ matrix.compiler }} --version
+
+      - name: Compilar e executar testes unitarios e CLI
+        run: make CC=${{ matrix.compiler }} test
+
+      - name: Executar testes com AddressSanitizer e UBSan
+        run: make CC=${{ matrix.compiler }} sanitize
